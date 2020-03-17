@@ -45,10 +45,6 @@ def send():
                 except:
                     f=open(ndir, 'w+')
                 msg=""
-                a=f.read()
-                if a:
-                    #print(a)
-                    a+="<nextmail>" 
                 msg+="<from>" + account +"<priority>"+ str(priority) + "<body>" + content
                 f.write(msg)
                 f.close()
