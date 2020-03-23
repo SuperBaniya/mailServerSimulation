@@ -50,7 +50,7 @@ class mail:
         to = self.toget.get()
         print(to)
         if to:
-            tmp = re.search("\w+@\w+.\w+", to)
+            tmp = re.search("@(\w+\.)+\w+$", to)
             print(tmp)
             if tmp:
                 ndir = path.join(dir, ("sentbox\\%s.txt" % to))
