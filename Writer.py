@@ -48,16 +48,16 @@ class mail:
         self.forgeterrors()
         dir = path.dirname(__file__)
         to = self.toget.get()
-        print(to)
+        #print(to)
         if to:
             tmp = re.search("@(\w+\.)+\w+$", to)
-            print(tmp)
+            #print(tmp)
             if tmp:
-                ndir = path.join(dir, ("sentbox\\%s.txt" % to))
+                ndir = path.join(dir, ("sentbox\\%s--%s.txt" % (account, to)))
                 content = contentbody.get('1.0', 'end')
                 priority = self.prior.get()
-                print(priority)
-                print(content)
+                #print(priority)
+                #print(content)
                 if content != "\n":
                     try:
                         f = open(ndir, 'r+')
