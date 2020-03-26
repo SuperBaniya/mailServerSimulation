@@ -293,8 +293,8 @@ class mail:
                 print("".join(lines))
 
             msg.config(text="".join(lines))
-            # os.replace("sentbox\\"+file_to_display,
-            #            "receivedbox\\"+file_to_display)
+            os.replace("sentbox\\"+file_to_display,
+                       "receivedbox\\"+file_to_display)
 
         print(file_names)
         inbox['values'] = senders_emails
