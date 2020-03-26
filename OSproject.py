@@ -288,11 +288,13 @@ class mail:
             lines = []
             with open('sentbox\\'+file_to_display) as fc:
                 for line in fc.readlines():
-                    print(line)
-                    lines.append(line)
-            msg.config(text=lines)
-            os.replace("sentbox\\"+file_to_display,
-                       "receivedbox\\"+file_to_display)
+                    l = line.split("<priority>")[1].split("<body>")
+                    lines.append(l[1])
+                print("".join(lines))
+
+            msg.config(text="".join(lines))
+            # os.replace("sentbox\\"+file_to_display,
+            #            "receivedbox\\"+file_to_display)
 
         print(file_names)
         inbox['values'] = senders_emails
@@ -306,5 +308,5 @@ class mail:
 
 obj = mail()
 obj.create()
-obj.read()
+obj.login()
 window.mainloop()
