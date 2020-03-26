@@ -277,14 +277,22 @@ class mail:
                     if s1 in file:
                         s2 = file.split("--")
                         senders_emails.append(s2[0])
+                        print(s1)
                         file_names.append(file)
 
         def readmessage():
             print(file_names)
-            msg.config(text="THIS IS THE TEXT IN THE MESSAGE")
             sender = inbox.get()
             file_to_display = file_names[senders_emails.index(sender)]
             print(file_to_display)
+            lines = []
+            with open('sentbox\\'+file_to_display) as fc:
+                for line in fc.readlines():
+                    print(line)
+                    lines.append(line)
+            msg.config(text=lines)
+            os.replace("sentbox\\"+file_to_display,
+                       "receivedbox\\"+file_to_display)
 
         print(file_names)
         inbox['values'] = senders_emails
@@ -298,5 +306,5 @@ class mail:
 
 obj = mail()
 obj.create()
-obj.login()
+obj.read()
 window.mainloop()
