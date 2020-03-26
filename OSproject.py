@@ -279,9 +279,20 @@ class mail:
                         senders_emails.append(s2[0])
                         file_names.append(file)
 
+        def readmessage():
+            print(file_names)
+            msg.config(text="THIS IS THE TEXT IN THE MESSAGE")
+            sender = inbox.get()
+            file_to_display = file_names[senders_emails.index(sender)]
+            print(file_to_display)
+
         print(file_names)
         inbox['values'] = senders_emails
         inbox.grid()
+        Button(ff, text="READ MESSAGE",
+               command=readmessage).grid(row=2, column=0)
+        msg = Label(ff, text="Username")
+        msg.grid()
         ff.grid()
 
 
