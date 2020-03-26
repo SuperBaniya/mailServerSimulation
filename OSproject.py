@@ -134,13 +134,13 @@ class mail:
         self.user.set("abc@gmail.com")
 
         global p1
-        p1 = 'C:\\\\Users\\naman\\Desktop\\LECTURES\\MPSTME\\mailServerSimulation\\sentbox'
+        p1 = os.getcwd()
 
         global l1
         files, l1 = [], []
 
         # r=root, d=directories, f = files
-        for r, d, f in os.walk(p1):
+        for r, d, f in os.walk(p1+'\\sentbox'):
             for file in f:
                 if '.txt' in file:
                     s1 = self.user.get() + "--"
@@ -267,10 +267,10 @@ class mail:
         self.user.set('enji@gmail.com')
         Label(ff, text="INBOX").grid()
         inbox = ttk.Combobox()
-        p1 = 'C:\\\\Users\\naman\\Desktop\\LECTURES\\MPSTME\\mailServerSimulation\\sentbox'
+        p1 = os.getcwd()
         senders_emails = []
         file_names = []
-        for r, d, f in os.walk(p1):
+        for r, d, f in os.walk(p1 + '\\sentbox'):
             for file in f:
                 if '.txt' in file:
                     s1 = "--"+self.user.get()
