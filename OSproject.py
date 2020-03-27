@@ -16,7 +16,7 @@ if not path.exists('receivedbox'):
     os.makedirs('receivedbox')
 
 window = Tk()
-window.geometry("250x265")
+window.geometry("250x330")
 account = "xyz@gmail.com"
 
 
@@ -33,13 +33,13 @@ class mail:
     def create(self):
         global ff
         ff = Frame(window)
-        self.incorrectemail = ttk.Label(ff, text="Incorrect email!")
-        self.enteremail = ttk.Label(ff, text="Enter an email!")
-        self.emptybody = ttk.Label(ff, text="Cannot be empty!")
+        self.incorrectemail = ttk.Label(ff, text="Incorrect email!", font=("Calibri", 12))
+        self.enteremail = ttk.Label(ff, text="Enter an email!", font=("Calibri", 12))
+        self.emptybody = ttk.Label(ff, text="Cannot be empty!", font=("Calibri", 12))
         self.invalid = Label(
             ff, text="Invalid Username/Password pair. Try again.", fg="red")
-        self.alreadyexists = Label(ff, text="Username already exists!")
-        self.registered = Label(ff, text="Registered! Try logging in!")
+        self.alreadyexists = Label(ff, text="Username already exists!", font=("Calibri", 12))
+        self.registered = Label(ff, text="Registered! Try logging in!", font=("Calibri", 12))
         self.lb1 = Listbox(ff)
 
     def die(self):
@@ -86,28 +86,30 @@ class mail:
     def send(self):
         self.die()
         self.create()
-        ttk.Label(ff, text="To:").grid()
+        ttk.Label(ff, text="To:", font=("Calibri", 12)).grid()
         ttk.Entry(ff, textvariable=self.toget).grid()
 
         global contentbody
-        contentbody = Text(ff, height=10, width=30)
-        contentbody.grid(padx=2)
+        ttk.Label(ff, text="Content:", font=("Calibri", 12)).grid()
+        contentbody = Text(ff, height=10, width=29)
+        contentbody.grid(padx=6)
 
         self.prior.set(1)
-        ttk.Label(ff, text="Priority").grid()
+        ttk.Label(ff, text="Priority", font=("Calibri", 12)).grid()
         priorbox = ttk.Spinbox(
             ff, from_=0.0, to=4.0, textvariable=self.prior, wrap=True, width=5, state='readonly')
         priorbox.grid()
-        ttk.Button(ff, text="Send", command=self.sendfunc).grid()
+        ttk.Button(ff, text="Send", command=self.sendfunc).grid(pady=2)
 
         ff.grid()
 
-    def onselect(self, evt,):
+    def onselect(self, evt):
         w = evt.widget
         index = int(w.curselection()[0])
         value = w.get(index)
         self.click = w.get(index)
-        print('You selected item %d: "%s"' % (index, value))
+        self.editbody=value
+        #print('You selected item %d: "%s"' % (index, value))
 
     def edit1func(self):
         global s3
@@ -149,16 +151,16 @@ class mail:
                         s3 = s2[1].split(".txt")
                         files.append(s3[0])
 
-        ttk.Label(ff, text="Select Email ID").grid(row=0, column=0)
+        ttk.Label(ff, text="Select Email ID", font=("Calibri", 12)).grid(row=0, column=0)
         self.lb1.grid(row=3, column=0)
 
-        ttk.Label(ff, text="Select Mail").grid(row=2, column=0)
+        ttk.Label(ff, text="Select Mail", font=("Calibri", 12)).grid(row=2, column=0)
         OptionMenu(ff, self.choose, *files,
                    command=lambda _: self.edit1func()).grid(row=1, column=0)
 
         ttk.Button(ff, text="Edit", command=self.edit2).grid()
 
-        ff.grid()
+        ff.grid(padx=50, pady=30)
 
     def edit2func(self):
         l2 = []
@@ -183,32 +185,33 @@ class mail:
         self.die()
         self.create()
 
-        ttk.Label(ff, text="New Message").grid(row=0, column=0)
-        ttk.Label(ff, text=f"To:  {self.choose.get()}").grid(row=1, column=0)
-
+        ttk.Label(ff, text="Edit Message", font=("Calibri", 12)).grid(row=0, column=0)
+        ttk.Label(ff, text=f"To:  {self.choose.get()}", font=("Calibri", 12)).grid(row=1, column=0)
+        
         global cb
-        cb = Text(ff, height=10, width=30)
-        cb.grid(padx=2)
-
+        cb = Text(ff, height=10, width=29)
+        cb.insert(END, self.editbody)
+        cb.grid(padx=6)
+        
         self.prior.set(1)
-        ttk.Label(ff, text="Priority").grid()
+        ttk.Label(ff, text="Priority", font=("Calibri", 12)).grid()
         priorbox = ttk.Spinbox(
             ff, from_=0.0, to=4.0, textvariable=self.prior, wrap=True, width=5, state='readonly')
         priorbox.grid()
 
         ttk.Button(ff, text="Save", command=self.edit2func).grid()
 
-        ff.grid()
+        ff.grid(pady=2)
 
     def home(self):
         self.die()
         self.create()
 
-        Button(ff, text="Send", command=self.send).grid(row=0, column=0)
-        Button(ff, text="Edit", command=self.edit1).grid(row=0, column=1)
-        Button(ff, text="Read", command=self.read).grid(row=0, column=2)
+        Button(ff, text="Send", command=self.send, height=2, width=8).grid(pady=5)
+        Button(ff, text="Edit", command=self.edit1, height=2, width=8).grid(pady=5)
+        Button(ff, text="Read", command=self.read, height=2, width=8).grid(pady=5)
 
-        ff.grid()
+        ff.grid(padx=90, pady=75)
 
     def validatelogin(self):
         u1 = self.user.get()
@@ -236,8 +239,8 @@ class mail:
         self.die()
         self.create()
 
-        Label(ff, text="Enter New Username").grid(row=0, column=0)
-        Label(ff, text="Last New Password").grid(row=1, column=0)
+        Label(ff, text="Enter New Username", font=("Calibri", 12)).grid(row=0, column=0)
+        Label(ff, text="Last New Password", font=("Calibri", 12)).grid(row=1, column=0)
         Entry(ff, textvariable=self.user).grid(row=0, column=1)
         Entry(ff, textvariable=self.pwd).grid(row=1, column=1)
         Button(ff, text="Register", command=self.validatesignup).grid(
@@ -249,23 +252,22 @@ class mail:
         self.die()
         self.create()
 
-        Label(ff, text="Username").grid(row=0, column=0)
-        Label(ff, text="Password").grid(row=1, column=0)
+        Label(ff, text="Username", font=("Calibri", 12)).grid(pady=5)
+        ttk.Entry(ff, textvariable=self.user).grid()
+        Label(ff, text="Password", font=("Calibri", 12)).grid(pady=5)
+        ttk.Entry(ff, textvariable=self.pwd, show="*").grid()
 
-        ttk.Entry(ff, textvariable=self.user).grid(row=0, column=1)
-        ttk.Entry(ff, textvariable=self.pwd, show="*").grid(row=1, column=1)
-
-        Button(ff, text="Login", command=self.validatelogin).grid(
-            row=2, column=0)
-        Button(ff, text="Register", command=self.register).grid(row=2, column=1)
-
-        ff.grid()
+        bframe= Frame(ff)
+        Button(bframe, text="Login", command=self.validatelogin, height=2, width=8).grid()
+        Button(bframe, text="Register", command=self.register, height=2, width=8).grid(pady=6)
+        bframe.grid(pady=6)
+        ff.grid(padx=50, pady=40)
 
     def read(self):
         self.die()
         self.create()
         self.user.set('enji@gmail.com')
-        Label(ff, text="INBOX").grid()
+        Label(ff, text="INBOX", font=("Calibri", 12)).grid()
         inbox = ttk.Combobox()
         p1 = os.getcwd()
         senders_emails = []
@@ -301,7 +303,7 @@ class mail:
         inbox.grid()
         Button(ff, text="READ MESSAGE",
                command=readmessage).grid(row=2, column=0)
-        msg = Label(ff, text="Username")
+        msg = Label(ff, text="Username", font=("Calibri", 12))
         msg.grid()
         ff.grid()
 
