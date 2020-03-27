@@ -1,3 +1,0 @@
-<priority>1<body>yes
-<priority>1<body>no
-<priority>1<body>lmao
