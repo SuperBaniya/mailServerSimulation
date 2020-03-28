@@ -15,6 +15,8 @@ if not path.exists('sentbox'):
     os.makedirs('sentbox')
 if not path.exists('receivedbox'):
     os.makedirs('receivedbox')
+if not path.exists('sentbox\\spam'):
+    os.makedirs('sentbox\\spam')
 if not path.isfile("accounts.txt"):
     with open(path.join(os.getcwd(), "accounts.txt"), 'w') as _:
         _.write("{}")
