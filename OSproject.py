@@ -351,6 +351,9 @@ class mail:
         p1 = os.getcwd()
         senders_emails = []
         file_names = []
+        path, dirs, files = next(os.walk("receivedbox"))
+        file_count = len(files)
+
         for r, d, f in os.walk(p1 + '\\sentbox'):
             for file in f:
                 if '.txt' in file:
@@ -374,14 +377,35 @@ class mail:
                 # print("".join(lines))
 
             msg.config(text="".join(lines))
-            os.replace(os.getcwd() + "\\sentbox\\" + file_to_display,
-                       os.getcwd() + "\\receivedbox\\" + file_to_display)
+            if(file_count < 6):
+                os.replace(os.getcwd() + "\\sentbox\\" + file_to_display,
+                           os.getcwd() + "\\receivedbox\\" + file_to_display)
+            else:
+                os.replace(os.getcwd() + "\\sentbox\\" + file_to_display,
+                           os.getcwd() + "\\receivedbox\\queue\\" + file_to_display)
+
+        def purgeinbox():
+            dir_name = os.getcwd() + "\\receivedbox"
+            test = os.listdir(dir_name)
+
+            for item in test:
+                if item.endswith(".txt"):
+                    os.remove(os.path.join(dir_name, item))
+            dir_name = os.getcwd() + "\\receivedbox\\queue"
+            test = os.listdir(dir_name)
+
+            for item in test:
+                os.replace(os.getcwd() + "\\receivedbox\\queue" + item,
+                           os.getcwd() + "\\receivedbox\\" + item)
 
         # print(file_names)
         inbox['values'] = senders_emails
         inbox.grid()
         Button(ff, text="Read Message",
                command=readmessage).grid(row=2, column=0, pady=3)
+        Button(ff, text="Purge Inbox",
+               command=purgeinbox).grid(row=3, column=0, pady=3)
+
         msg = Label(ff, text="Username", font=("Calibri", 12))
         msg.grid()
         ff.grid(padx=40)
@@ -389,5 +413,5 @@ class mail:
 
 obj = mail()
 obj.create()
-obj.login()
+obj.read()
 window.mainloop()
