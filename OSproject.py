@@ -14,9 +14,17 @@ if not path.exists('sentbox'):
     os.makedirs('sentbox')
 if not path.exists('receivedbox'):
     os.makedirs('receivedbox')
+if not path.isfile("accounts.txt"):
+    with open(path.join(os.getcwd(), "accounts.txt"), 'w') as _:
+        pass
+
+l1 = []
+with open("accounts.txt") as fc:
+    for line in fc.readlines():
+        l1.append(line)
 
 window = Tk()
-window.geometry("250x350")
+window.geometry("250x400")
 window.resizable(width=False, height=False)
 ff = Frame(window)
 
@@ -27,10 +35,10 @@ class mail:
         self.prior = IntVar()
         self.toget = StringVar()
         self.content = StringVar()
+        self.sub = StringVar()
         self.user = StringVar()
         self.pwd = StringVar()
         self.choose = StringVar()
-        self.d1 = {"aryann": "1234", "dc": "normie", "naman": "666", "": "", "xyz@gmail.com":""}
         self.backbutton = ttk.Button(window)
 
     def backButton(self, cmd):
@@ -49,10 +57,9 @@ class mail:
         self.incorrectemail = ttk.Label(ff, text="Incorrect email!", font=("Calibri", 12))
         self.enteremail = ttk.Label(ff, text="Enter an email!", font=("Calibri", 12))
         self.emptybody = ttk.Label(ff, text="Cannot be empty!", font=("Calibri", 12))
+        self.invalidreg = ttk.Label(ff, text="Invalid Email ID", font=("Calibri", 12))
         self.invalid = Label(
-            ff, text="Invalid Password", fg="red")
-        self.invaliduser=self.invalid = Label(
-            ff, text="Invalid Email", fg="red")
+            ff, text="Invalid Email/Password", fg="red")
         self.alreadyexists = Label(ff, text="Username already exists!", font=("Calibri", 12))
         self.registered = Label(ff, text="Registered! Try logging in!", font=("Calibri", 12))
         self.lb1 = Listbox(ff, width=25)
@@ -70,12 +77,12 @@ class mail:
     def sendfunc(self):
         self.forgeterrors()
         dir = path.dirname(__file__)
-        account=self.user.get()
         to = self.toget.get()
+        x = self.user.get()
         if to:
-            tmp = re.search("\w+@\w+.\w+", to)
+            tmp = re.search("(\w+\.?)+@\w +.\w +", to)
             if tmp:
-                ndir = path.join(dir, ("sentbox\\%s.txt" % to))
+                ndir = path.join(dir, f"sentbox\\{x}--{to}.txt")
                 content = contentbody.get('1.0', 'end')
                 priority = self.prior.get()
                 if content != "\n":
@@ -84,8 +91,8 @@ class mail:
                     except:
                         f = open(ndir, 'w+')
                     msg = ""
-                    msg += "<from>" + account + "<priority>" + \
-                           str(priority) + "<body>" + content
+                    msg += "<priority>" + \
+                           str(priority) + "<subject>" + self.sub.get() + "<body>" + content
                     f.write(msg)
                     f.close()
                     contentbody.delete('1.0', 'end')
@@ -104,8 +111,11 @@ class mail:
         ttk.Label(ff, text="To:", font=("Calibri", 12)).grid()
         ttk.Entry(ff, textvariable=self.toget).grid()
 
-        global contentbody
+        ttk.Label(ff, text="Subject:", font=("Calibri", 12)).grid()
+        ttk.Entry(ff, textvariable=self.sub).grid()
+
         ttk.Label(ff, text="Content:", font=("Calibri", 12)).grid()
+        global contentbody
         contentbody = Text(ff, height=10, width=29)
         contentbody.grid(padx=6)
 
@@ -124,7 +134,6 @@ class mail:
         value = w.get(index)
         self.click = w.get(index)
         self.editbody = value
-        # print('You selected item %d: "%s"' % (index, value))
 
     def edit1func(self):
         global s3
@@ -149,8 +158,6 @@ class mail:
         self.die()
         self.create()
         self.backButton(self.home)
-
-        self.user.set("abc@gmail.com")
 
         global p1
         p1 = os.getcwd()
@@ -231,14 +238,18 @@ class mail:
     def validatelogin(self):
         u1 = self.user.get()
         pwd = self.pwd.get()
+        ctr = 0
 
-        try:
-            if self.d1[u1] == pwd:
-                self.home()
-            else:
-                self.invalid.grid()
-        except KeyError:
-            self.invaliduser.grid()
+        for i in l1:
+            if u1 in i and pwd in i:
+                ctr = 1
+                break
+
+        if ctr == 0:
+            self.invalid.grid()
+        else:
+            self.home()
+
     def validatesignup(self):
         self.forgeterrors()
         u = self.user.get()
@@ -246,10 +257,16 @@ class mail:
 
         if u == "" or p == "":
             self.emptybody.grid()
-        elif u in self.d1:
+        elif u in l1:
             self.alreadyexists.grid()
+        elif not re.search("(\w+\.?)+@\w+.\w+", u):
+            self.invalidreg.grid()
         else:
-            self.registered.grid()
+            l1.append("\n" + u + " " + p)
+            f = open("accounts.txt", "w")
+            for i in l1:
+                f.write(i)
+            f.close()
             self.login()
 
     def register(self):
@@ -257,7 +274,7 @@ class mail:
         self.create()
         self.backButton(self.login)
 
-        Label(ff, text="Enter New Email", font=("Calibri", 12)).grid()
+        Label(ff, text="Enter New Email ID", font=("Calibri", 12)).grid()
         ttk.Entry(ff, textvariable=self.user).grid()
         Label(ff, text="Enter New Password", font=("Calibri", 12)).grid()
 
@@ -270,7 +287,7 @@ class mail:
         self.die()
         self.create()
 
-        Label(ff, text="Email", font=("Calibri", 12)).grid(pady=5)
+        Label(ff, text="Email ID", font=("Calibri", 12)).grid(pady=5)
         ttk.Entry(ff, textvariable=self.user).grid()
         Label(ff, text="Password", font=("Calibri", 12)).grid(pady=5)
         ttk.Entry(ff, textvariable=self.pwd, show="*").grid()
@@ -286,7 +303,6 @@ class mail:
         self.create()
         self.backButton(self.home)
 
-        #self.user.set('enji@gmail.com')
         Label(ff, text="INBOX", font=("Calibri", 12)).grid()
         inbox = ttk.Combobox(ff)
         p1 = os.getcwd()
@@ -299,26 +315,26 @@ class mail:
                     if s1 in file:
                         s2 = file.split("--")
                         senders_emails.append(s2[0])
-                        print(s1)
+                        # print(s1)
                         file_names.append(file)
 
         def readmessage():
-            print(file_names)
+            # print(file_names)
             sender = inbox.get()
             file_to_display = file_names[senders_emails.index(sender)]
-            print(file_to_display)
+            # print(file_to_display)
             lines = []
             with open('sentbox\\' + file_to_display) as fc:
                 for line in fc.readlines():
                     l = line.split("<priority>")[1].split("<body>")
                     lines.append(l[1])
-                print("".join(lines))
+                # print("".join(lines))
 
             msg.config(text="".join(lines))
             os.replace(os.getcwd() + "\\sentbox\\" + file_to_display,
                        os.getcwd() + "\\receivedbox\\" + file_to_display)
 
-        print(file_names)
+        # print(file_names)
         inbox['values'] = senders_emails
         inbox.grid()
         Button(ff, text="Read Message",
