@@ -18,7 +18,6 @@ if not path.exists('receivedbox'):
 if not path.isfile("accounts.txt"):
     with open(path.join(os.getcwd(), "accounts.txt"), 'w') as _:
         _.write("{}")
-        pass
 
 window = Tk()
 window.geometry("250x400")
@@ -266,7 +265,6 @@ class mail:
         elif not re.search("(\w+\.?)+@\w+.\w+", u):
             self.invalidreg.grid()
         else:
-            d2 = json.load(open("accounts.txt"))
             d2[u] = p
             json.dump(d2, open("accounts.txt", 'w'))
 
