@@ -17,6 +17,7 @@ if not path.exists('receivedbox'):
     os.makedirs('receivedbox')
 if not path.isfile("accounts.txt"):
     with open(path.join(os.getcwd(), "accounts.txt"), 'w') as _:
+        _.write("{}")
         pass
 
 window = Tk()
@@ -256,10 +257,11 @@ class mail:
         self.forgeterrors()
         u = self.user.get()
         p = self.pwd.get()
-
+        d2 = json.load(open("accounts.txt"))
+        
         if u == "" or p == "":
             self.emptybody.grid()
-        elif u in l1:
+        elif u in d2:
             self.alreadyexists.grid()
         elif not re.search("(\w+\.?)+@\w+.\w+", u):
             self.invalidreg.grid()
