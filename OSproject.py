@@ -9,6 +9,7 @@ from tkinter import ttk
 import os
 from os import path
 import re
+import json
 
 if not path.exists('sentbox'):
     os.makedirs('sentbox')
@@ -17,11 +18,6 @@ if not path.exists('receivedbox'):
 if not path.isfile("accounts.txt"):
     with open(path.join(os.getcwd(), "accounts.txt"), 'w') as _:
         pass
-
-l1 = []
-with open("accounts.txt") as fc:
-    for line in fc.readlines():
-        l1.append(line)
 
 window = Tk()
 window.geometry("250x400")
@@ -247,10 +243,9 @@ class mail:
         pwd = self.pwd.get()
         ctr = 0
 
-        for i in l1:
-            if u1 in i and pwd in i:
-                ctr = 1
-                break
+        d2 = json.load(open("accounts.txt"))
+        if d2[u1] == pwd:
+            ctr = 1
 
         if ctr == 0:
             self.invalid.grid()
@@ -269,11 +264,10 @@ class mail:
         elif not re.search("(\w+\.?)+@\w+.\w+", u):
             self.invalidreg.grid()
         else:
-            l1.append("\n" + u + " " + p)
-            f = open("accounts.txt", "w")
-            for i in l1:
-                f.write(i)
-            f.close()
+            d2 = json.load(open("accounts.txt"))
+            d2[u] = p
+            json.dump(d2, open("accounts.txt", 'w'))
+
             self.login()
 
     def register(self):
