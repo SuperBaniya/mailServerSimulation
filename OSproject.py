@@ -63,13 +63,13 @@ class mail:
         self.die()
         global ff
         ff = Frame(window)
-        self.incorrectemail = ttk.Label(ff, text="Incorrect email!", font=("Calibri", 12))
-        self.enteremail = ttk.Label(ff, text="Enter an email!", font=("Calibri", 12))
-        self.emptybody = ttk.Label(ff, text="Cannot be empty!", font=("Calibri", 12))
-        self.invalidreg = ttk.Label(ff, text="Invalid Email ID", font=("Calibri", 12))
-        self.invalid = Label(ff, text="Invalid Email/Password", fg="red")
-        self.alreadyexists = Label(ff, text="Username already exists!", font=("Calibri", 12))
-        self.registered = Label(ff, text="Registered! Try logging in!", font=("Calibri", 12))
+        self.incorrectemail = ttk.Label(ff, text="Incorrect email!", font=("Calibri", 10))
+        self.enteremail = ttk.Label(ff, text="Enter an email!", font=("Calibri", 10))
+        self.emptybody = ttk.Label(ff, text="Cannot be empty!", font=("Calibri", 10))
+        self.invalidreg = ttk.Label(ff, text="Invalid Email ID", font=("Calibri", 10))
+        self.invalid = Label(ff, text="Invalid Email/Password", fg="red", font=("Calibri", 10))
+        self.alreadyexists = Label(ff, text="Username already exists!", font=("Calibri", 10))
+        self.registered = Label(ff, text="Registered! Try logging in!", font=("Calibri", 10))
         self.lb1 = Listbox(ff, width=25)
 
     def clear(self):
@@ -261,13 +261,16 @@ class mail:
         ctr = 0
 
         d2 = json.load(open("accounts.txt"))
-        if d2[u1] == pwd:
-            ctr = 1
+        try:
+            if d2[u1] == pwd:
+                ctr = 1
 
-        if ctr == 0:
+            if ctr == 0:
+                self.invalid.grid()
+            else:
+                self.home()
+        except:
             self.invalid.grid()
-        else:
-            self.home()
 
     def validatesignup(self):
         self.forgeterrors()
