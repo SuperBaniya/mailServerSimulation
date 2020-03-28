@@ -19,6 +19,7 @@ if not path.exists('sentbox\\spam'):
     os.makedirs('sentbox\\spam')
 if not path.exists('receivedbox\\queue'):
     os.makedirs('receivedbox\\queue')
+
 if not path.isfile("accounts.txt"):
     with open(path.join(os.getcwd(), "accounts.txt"), 'w') as _:
         _.write("{}")
@@ -80,11 +81,15 @@ class mail:
         self.registered = Label(
             ff, text="Registered! Try logging in!", font=("Calibri", 10))
         self.lb1 = Listbox(ff, width=25)
+        self.emptysubject = Label(
+            ff, text="Subject cannot be empty!", font=("Calibri", 10))
 
     def clear(self):
         self.prior.set("")
         self.toget.set("")
         self.content.set("")
+        self.user.set("")
+        self.pwd.set("")
 
     def forgeterrors(self):
         enames = ['incorrectemail', 'enteremail', 'emptybody']
@@ -103,22 +108,25 @@ class mail:
                 content = contentbody.get('1.0', 'end')
                 priority = self.prior.get()
                 if content != "\n":
-                    for word in spamwords:
-                        if word in content:
-                            ndir = path.join(
-                                dir, f"sentbox\\spam\\{x}--{to}.txt")
-                            break
-                    try:
-                        f = open(ndir, 'r+')
-                    except:
-                        f = open(ndir, 'w+')
-                    msg = ""
-                    msg += "<priority>" + \
-                           str(priority) + "<subject>" + \
-                        self.sub.get() + "<body>" + content
-                    f.write(msg)
-                    f.close()
-                    contentbody.delete('1.0', 'end')
+                    if priority is "":
+                        for word in spamwords:
+                            if word in content:
+                                ndir = path.join(
+                                    dir, f"sentbox\\spam\\{x}--{to}.txt")
+                                break
+                        try:
+                            f = open(ndir, 'r+')
+                        except:
+                            f = open(ndir, 'w+')
+                        msg = ""
+                        msg += "<priority>" + \
+                               str(priority) + "<subject>" + \
+                            self.sub.get() + "<body>" + content
+                        f.write(msg)
+                        f.close()
+                        contentbody.delete('1.0', 'end')
+                    else:
+                        self.emptysubject.grid()
                 else:
                     self.emptybody.grid()
             else:
@@ -188,7 +196,6 @@ class mail:
         global l1
         files, l1 = [], []
 
-        # r=root, d=directories, f = files
         for r, d, f in os.walk(p1 + '\\sentbox'):
             for file in f:
                 if '.txt' in file:
@@ -365,16 +372,13 @@ class mail:
                         file_names.append(file)
 
         def readmessage():
-            # print(file_names)
             sender = inbox.get()
             file_to_display = file_names[senders_emails.index(sender)]
-            # print(file_to_display)
             lines = []
             with open('sentbox\\' + file_to_display) as fc:
                 for line in fc.readlines():
                     l = line.split("<priority>")[1].split("<body>")
                     lines.append(l[1])
-                # print("".join(lines))
 
             msg.config(text="".join(lines))
             if(file_count < 6):
@@ -398,7 +402,6 @@ class mail:
                 os.replace(os.getcwd() + "\\receivedbox\\queue" + item,
                            os.getcwd() + "\\receivedbox\\" + item)
 
-        # print(file_names)
         inbox['values'] = senders_emails
         inbox.grid()
         Button(ff, text="Read Message",
@@ -413,5 +416,5 @@ class mail:
 
 obj = mail()
 obj.create()
-obj.read()
+obj.login()
 window.mainloop()
