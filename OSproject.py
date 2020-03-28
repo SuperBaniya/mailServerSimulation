@@ -173,12 +173,14 @@ class mail:
 
         with open(s3) as fc:
             for line in fc.readlines():
-                s1 = line.split("\n")
-                s2 = "".join(s1[0])
-                s2 = s2.split("<body>")
-                s2 = "".join(s2[0])
-                s2 = s2.split("<subject>")
-                l1.append(s2[1])
+                if "<priority>" in line:
+                    s1 = line.split("\n")
+                    s2 = "".join(s1[0])
+                    s2 = s2.split("<body>")
+                    s2 = "".join(s2[0])
+                    s2 = s2.split("<subject>")
+                    print(s2)
+                    l1.append(s2[1])
 
         for f in l1:
             self.lb1.insert(END, f)
@@ -245,14 +247,17 @@ class mail:
 
         global cb
         cb = Text(ff, height=10, width=29)
-
+        ctr = 0
         with open(s3) as fc:
             for line in fc.readlines():
                 if self.click in line:
                     l2 = line.split("<body>")
-                    break
+                    s1 = l2[1]
+                    ctr = 1
+                if ctr == 1 and "<priority>" not in line:
+                    s1 += line
 
-        self.editbody = l2[1]
+        self.editbody = s1
 
         cb.insert(END, self.editbody)
         cb.grid(padx=6)
