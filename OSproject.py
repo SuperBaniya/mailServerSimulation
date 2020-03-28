@@ -18,8 +18,6 @@ if not path.exists('receivedbox'):
 window = Tk()
 window.geometry("250x350")
 window.resizable(width=False, height=False)
-
-account = "xyz@gmail.com"
 ff = Frame(window)
 
 
@@ -53,7 +51,8 @@ class mail:
         self.emptybody = ttk.Label(ff, text="Cannot be empty!", font=("Calibri", 12))
         self.invalid = Label(
             ff, text="Invalid Password", fg="red")
-        
+        self.invaliduser=self.invalid = Label(
+            ff, text="Invalid Email", fg="red")
         self.alreadyexists = Label(ff, text="Username already exists!", font=("Calibri", 12))
         self.registered = Label(ff, text="Registered! Try logging in!", font=("Calibri", 12))
         self.lb1 = Listbox(ff, width=25)
@@ -71,6 +70,7 @@ class mail:
     def sendfunc(self):
         self.forgeterrors()
         dir = path.dirname(__file__)
+        account=self.user.get()
         to = self.toget.get()
         if to:
             tmp = re.search("\w+@\w+.\w+", to)
@@ -232,12 +232,13 @@ class mail:
         u1 = self.user.get()
         pwd = self.pwd.get()
 
-        if self.d1[u1] == pwd:
-            self.home()
-        else:
-            self.invalid.grid_propagate(True)
-            self.invalid.grid()
-
+        try:
+            if self.d1[u1] == pwd:
+                self.home()
+            else:
+                self.invalid.grid()
+        except KeyError:
+            self.invaliduser.grid()
     def validatesignup(self):
         self.forgeterrors()
         u = self.user.get()
@@ -256,7 +257,7 @@ class mail:
         self.create()
         self.backButton(self.login)
 
-        Label(ff, text="Enter New Username", font=("Calibri", 12)).grid()
+        Label(ff, text="Enter New Email", font=("Calibri", 12)).grid()
         ttk.Entry(ff, textvariable=self.user).grid()
         Label(ff, text="Enter New Password", font=("Calibri", 12)).grid()
 
@@ -269,7 +270,7 @@ class mail:
         self.die()
         self.create()
 
-        Label(ff, text="Username", font=("Calibri", 12)).grid(pady=5)
+        Label(ff, text="Email", font=("Calibri", 12)).grid(pady=5)
         ttk.Entry(ff, textvariable=self.user).grid()
         Label(ff, text="Password", font=("Calibri", 12)).grid(pady=5)
         ttk.Entry(ff, textvariable=self.pwd, show="*").grid()
