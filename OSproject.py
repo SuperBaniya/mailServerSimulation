@@ -17,20 +17,22 @@ if not path.exists('receivedbox'):
     os.makedirs('receivedbox')
 if not path.exists('sentbox\\spam'):
     os.makedirs('sentbox\\spam')
+if not path.exists('receivedbox\\queue'):
+    os.makedirs('receivedbox\\queue')
 if not path.isfile("accounts.txt"):
     with open(path.join(os.getcwd(), "accounts.txt"), 'w') as _:
         _.write("{}")
 
 
-spamwords=["dhir", "spam", "money", "$$$", "lottery"]
+spamwords = ["dhir", "spam", "money", "$$$", "lottery"]
 if not path.isfile("spamwords.txt"):
     with open(path.join(os.getcwd(), "spamwords.txt"), 'a') as f:
         f.write("\n".join(spamwords))
 
 with open(path.join(os.getcwd(), "spamwords.txt"), 'r') as f:
-    spamwords=f.readlines()
+    spamwords = f.readlines()
 
-spamwords=[re.sub('\n', '', word) for word in spamwords]
+spamwords = [re.sub('\n', '', word) for word in spamwords]
 
 window = Tk()
 window.geometry("250x400")
@@ -63,13 +65,20 @@ class mail:
         self.die()
         global ff
         ff = Frame(window)
-        self.incorrectemail = ttk.Label(ff, text="Incorrect email!", font=("Calibri", 10))
-        self.enteremail = ttk.Label(ff, text="Enter an email!", font=("Calibri", 10))
-        self.emptybody = ttk.Label(ff, text="Cannot be empty!", font=("Calibri", 10))
-        self.invalidreg = ttk.Label(ff, text="Invalid Email ID", font=("Calibri", 10))
-        self.invalid = Label(ff, text="Invalid Email/Password", fg="red", font=("Calibri", 10))
-        self.alreadyexists = Label(ff, text="Username already exists!", font=("Calibri", 10))
-        self.registered = Label(ff, text="Registered! Try logging in!", font=("Calibri", 10))
+        self.incorrectemail = ttk.Label(
+            ff, text="Incorrect email!", font=("Calibri", 10))
+        self.enteremail = ttk.Label(
+            ff, text="Enter an email!", font=("Calibri", 10))
+        self.emptybody = ttk.Label(
+            ff, text="Cannot be empty!", font=("Calibri", 10))
+        self.invalidreg = ttk.Label(
+            ff, text="Invalid Email ID", font=("Calibri", 10))
+        self.invalid = Label(ff, text="Invalid Email/Password",
+                             fg="red", font=("Calibri", 10))
+        self.alreadyexists = Label(
+            ff, text="Username already exists!", font=("Calibri", 10))
+        self.registered = Label(
+            ff, text="Registered! Try logging in!", font=("Calibri", 10))
         self.lb1 = Listbox(ff, width=25)
 
     def clear(self):
@@ -96,7 +105,8 @@ class mail:
                 if content != "\n":
                     for word in spamwords:
                         if word in content:
-                            ndir=path.join(dir, f"sentbox\\spam\\{x}--{to}.txt")
+                            ndir = path.join(
+                                dir, f"sentbox\\spam\\{x}--{to}.txt")
                             break
                     try:
                         f = open(ndir, 'r+')
@@ -104,7 +114,8 @@ class mail:
                         f = open(ndir, 'w+')
                     msg = ""
                     msg += "<priority>" + \
-                           str(priority) + "<subject>" + self.sub.get() + "<body>" + content
+                           str(priority) + "<subject>" + \
+                        self.sub.get() + "<body>" + content
                     f.write(msg)
                     f.close()
                     contentbody.delete('1.0', 'end')
@@ -187,10 +198,12 @@ class mail:
                         s3 = s2[1].split(".txt")
                         files.append(s3[0])
 
-        ttk.Label(ff, text="Select Email ID", font=("Calibri", 12)).grid(row=0, column=0)
+        ttk.Label(ff, text="Select Email ID", font=(
+            "Calibri", 12)).grid(row=0, column=0)
         self.lb1.grid(row=3, column=0)
 
-        ttk.Label(ff, text="Select Mail", font=("Calibri", 12)).grid(row=2, column=0)
+        ttk.Label(ff, text="Select Mail", font=(
+            "Calibri", 12)).grid(row=2, column=0)
         ttk.OptionMenu(ff, self.choose, "Select one", *files,
                        command=lambda _: self.edit1func()).grid(row=1, column=0)
 
@@ -218,8 +231,10 @@ class mail:
         self.create()
         self.backButton(self.edit1)
 
-        ttk.Label(ff, text="Edit Message", font=("Calibri", 12)).grid(row=0, column=0)
-        ttk.Label(ff, text=f"To:  {self.choose.get()}", font=("Calibri", 12)).grid(row=1, column=0)
+        ttk.Label(ff, text="Edit Message", font=(
+            "Calibri", 12)).grid(row=0, column=0)
+        ttk.Label(ff, text=f"To:  {self.choose.get()}", font=(
+            "Calibri", 12)).grid(row=1, column=0)
 
         global cb
         cb = Text(ff, height=10, width=29)
@@ -250,9 +265,12 @@ class mail:
         self.create()
         self.backButton(self.login)
 
-        Button(ff, text="Send", command=self.send, height=2, width=8).grid(pady=5)
-        Button(ff, text="Edit", command=self.edit1, height=2, width=8).grid(pady=5)
-        Button(ff, text="Read", command=self.read, height=2, width=8).grid(pady=5)
+        Button(ff, text="Send", command=self.send,
+               height=2, width=8).grid(pady=5)
+        Button(ff, text="Edit", command=self.edit1,
+               height=2, width=8).grid(pady=5)
+        Button(ff, text="Read", command=self.read,
+               height=2, width=8).grid(pady=5)
         ff.grid(padx=90, pady=75)
 
     def validatelogin(self):
@@ -277,7 +295,7 @@ class mail:
         u = self.user.get()
         p = self.pwd.get()
         d2 = json.load(open("accounts.txt"))
-        
+
         if u == "" or p == "":
             self.emptybody.grid()
         elif u in d2:
@@ -300,7 +318,8 @@ class mail:
         Label(ff, text="Enter New Password", font=("Calibri", 12)).grid()
 
         ttk.Entry(ff, textvariable=self.pwd).grid()
-        Button(ff, text="Register", command=self.validatesignup, height=2, width=8).grid(pady=5)
+        Button(ff, text="Register", command=self.validatesignup,
+               height=2, width=8).grid(pady=5)
 
         ff.grid(padx=50, pady=60)
 
@@ -315,8 +334,10 @@ class mail:
         ttk.Entry(ff, textvariable=self.pwd, show="*").grid()
 
         bframe = Frame(ff)
-        Button(bframe, text="Login", command=self.validatelogin, height=2, width=8).grid()
-        Button(bframe, text="Register", command=self.register, height=2, width=8).grid(pady=6)
+        Button(bframe, text="Login", command=self.validatelogin,
+               height=2, width=8).grid()
+        Button(bframe, text="Register", command=self.register,
+               height=2, width=8).grid(pady=6)
         bframe.grid(pady=6)
         ff.grid(padx=52, pady=40)
 
