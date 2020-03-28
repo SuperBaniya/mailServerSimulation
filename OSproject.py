@@ -58,8 +58,7 @@ class mail:
         self.enteremail = ttk.Label(ff, text="Enter an email!", font=("Calibri", 12))
         self.emptybody = ttk.Label(ff, text="Cannot be empty!", font=("Calibri", 12))
         self.invalidreg = ttk.Label(ff, text="Invalid Email ID", font=("Calibri", 12))
-        self.invalid = Label(
-            ff, text="Invalid Email/Password", fg="red")
+        self.invalid = Label(ff, text="Invalid Email/Password", fg="red")
         self.alreadyexists = Label(ff, text="Username already exists!", font=("Calibri", 12))
         self.registered = Label(ff, text="Registered! Try logging in!", font=("Calibri", 12))
         self.lb1 = Listbox(ff, width=25)
@@ -131,9 +130,7 @@ class mail:
     def onselect(self, evt):
         w = evt.widget
         index = int(w.curselection()[0])
-        value = w.get(index)
         self.click = w.get(index)
-        self.editbody = value
 
     def edit1func(self):
         global s3
@@ -147,6 +144,8 @@ class mail:
                 s1 = line.split("\n")
                 s2 = "".join(s1[0])
                 s2 = s2.split("<body>")
+                s2 = "".join(s2[0])
+                s2 = s2.split("<subject>")
                 l1.append(s2[1])
 
         for f in l1:
@@ -193,10 +192,9 @@ class mail:
                 if self.click not in line:
                     l2.append(line)
                 else:
-                    l2.append("<priority>" + str(self.prior.get()) +
+                    l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.editbody +
                               "<body>" + cb.get('1.0', 'end'))
         fc.close()
-
         fc = open(s3, "w")
         for i in l2:
             fc.write(i)
@@ -212,6 +210,15 @@ class mail:
 
         global cb
         cb = Text(ff, height=10, width=29)
+
+        with open(s3) as fc:
+            for line in fc.readlines():
+                if self.click in line:
+                    l2 = line.split("<body>")
+                    break
+
+        self.editbody = l2[1]
+
         cb.insert(END, self.editbody)
         cb.grid(padx=6)
 
@@ -286,6 +293,7 @@ class mail:
     def login(self):
         self.die()
         self.create()
+        self.clear()
 
         Label(ff, text="Email ID", font=("Calibri", 12)).grid(pady=5)
         ttk.Entry(ff, textvariable=self.user).grid()
