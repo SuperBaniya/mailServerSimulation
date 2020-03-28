@@ -19,6 +19,17 @@ if not path.isfile("accounts.txt"):
     with open(path.join(os.getcwd(), "accounts.txt"), 'w') as _:
         _.write("{}")
 
+
+spamwords=["dhir", "spam", "money", "$$$", "lottery"]
+if not path.isfile("spamwords.txt"):
+    with open(path.join(os.getcwd(), "spamwords.txt"), 'a') as f:
+        f.write("\n".join(spamwords))
+
+with open(path.join(os.getcwd(), "spamwords.txt"), 'r') as f:
+    spamwords=f.readlines()
+
+spamwords=[re.sub('\n', '', word) for word in spamwords]
+
 window = Tk()
 window.geometry("250x400")
 window.resizable(width=False, height=False)
@@ -75,12 +86,16 @@ class mail:
         to = self.toget.get()
         x = self.user.get()
         if to:
-            tmp = re.search("(\w+\.?)+@\w +.\w +", to)
+            tmp = re.search("(\w+\.?)+@\w+.\w+", to)
             if tmp:
                 ndir = path.join(dir, f"sentbox\\{x}--{to}.txt")
                 content = contentbody.get('1.0', 'end')
                 priority = self.prior.get()
                 if content != "\n":
+                    for word in spamwords:
+                        if word in content:
+                            ndir=path.join(dir, f"sentbox\\spam\\{x}--{to}.txt")
+                            break
                     try:
                         f = open(ndir, 'r+')
                     except:
