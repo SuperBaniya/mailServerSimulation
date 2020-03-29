@@ -289,6 +289,121 @@ class mail:
             self.selectsomething.grid()
         ff.grid(pady=2)
 
+    def read1func(self):
+        self.selectsomething = Label(ff, text="Please ensure selection!")
+        self.selectsomething.grid_forget()
+        global s3
+        s3 = p1 + "\\sentbox\\" + self.choose.get() + "--" + self.user.get() + ".txt"
+
+        self.lb1.delete(0, END)
+        l1.clear()
+        try:
+            with open(s3) as fc:
+                for line in fc.readlines():
+                    if "<priority>" in line:
+                        s1 = line.split("\n")
+                        s2 = "".join(s1[0])
+                        s2 = s2.split("<body>")
+                        s2 = "".join(s2[0])
+                        s2 = s2.split("<subject>")
+                        print(s2)
+                        l1.append(s2[1])
+
+            for f in l1:
+                self.lb1.insert(END, f)
+        except:
+            self.selectsomething.grid()
+
+        self.lb1.bind('<<ListboxSelect>>', self.onselect)
+
+    def read1(self):
+        self.die()
+        self.create()
+        self.backButton(self.home)
+
+        global p1
+        p1 = os.getcwd()
+
+        global l1
+        files, l1 = [], []
+
+        for r, d, f in os.walk(p1 + '\\sentbox'):
+            for file in f:
+                if '.txt' in file:
+                    s1 = "--" + self.user.get() 
+                    if s1 in file:
+                        s2 = file.split("--")
+                        s3 = s2[0]
+                        files.append(s3)
+
+        ttk.Label(ff, text="Select Email ID", font=(
+            "Calibri", 12)).grid(row=0, column=0)
+        self.lb1.grid(row=3, column=0)
+
+        ttk.Label(ff, text="Select Mail", font=(
+            "Calibri", 12)).grid(row=2, column=0)
+        ttk.OptionMenu(ff, self.choose, "Select one", *files,
+                       command=lambda _: self.read1func()).grid(row=1, column=0)
+
+        ttk.Button(ff, text="Read", command=self.read2).grid(pady=5)
+
+        ff.grid(padx=36, pady=30)
+
+    def read2func(self):
+        l2 = []
+        with open(s3) as fc:
+            for line in fc.readlines():
+                if self.click not in line:
+                    l2.append(line)
+                else:
+                    l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.editbody +
+                              "<body>" + cb.get('1.0', 'end'))
+        fc.close()
+        fc = open(s3, "w")
+        for i in l2:
+            fc.write(i)
+        fc.close()
+
+    def read2(self):
+        try:
+            self.die()
+            self.create()
+            self.backButton(self.edit1)
+            ttk.Label(ff, text="Edit Message", font=(
+                "Calibri", 12)).grid(row=0, column=0)
+            ttk.Label(ff, text=f"To:  {self.choose.get()}", font=(
+                "Calibri", 12)).grid(row=1, column=0)
+            self.selectsomething = Label(ff, text="Please ensure selection!")
+            self.selectsomething.grid_forget()
+            global cb
+            cb = Text(ff, height=10, width=29, state='disabled')
+            ctr = 0
+            with open(s3) as fc:
+                with open(s3) as fc:
+                    for line in fc.readlines():
+                        if self.click in line:
+                            l2 = line.split("<body>")
+                            s1 = l2[1]
+                            ctr = 1
+                        if ctr == 1 and "<priority>" not in line:
+                            s1 += line
+            
+            self.readbody = s1
+
+            cb.insert(END, self.readbody)
+            cb.grid(padx=6)
+
+            self.prior.set(1)
+            ttk.Label(ff, text="Priority", font=("Calibri", 12)).grid()
+            priorbox = ttk.Spinbox(
+                ff, from_=0.0, to=4.0, textvariable=self.prior, wrap=True, width=5, state='disabled')
+            priorbox.grid()
+
+            ttk.Button(ff, text="Close", command=self.read2func).grid(pady=5)
+        except:
+            self.selectsomething.grid()
+        ff.grid(pady=2)
+
     def home(self):
         self.die()
         self.create()
