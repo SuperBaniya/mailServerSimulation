@@ -119,7 +119,7 @@ class mail:
                 content = contentbody.get('1.0', 'end')
                 priority = self.prior.get()
                 if content != "\n":
-                    if priority == "":
+                    if self.sub.get() != "":
                         for word in spamwords:
                             if word in content:
                                 ndir = path.join(
@@ -515,6 +515,8 @@ class mail:
         self.backButton(self.home)
 
         Label(ff, text="INBOX", font=("Calibri", 12)).grid()
+        msg = Label(ff, text="Select username:", font=("Calibri", 12))
+        msg.grid()
         inbox = ttk.Combobox(ff)
         p1 = os.getcwd()
         senders_emails = []
@@ -566,12 +568,10 @@ class mail:
         inbox['values'] = senders_emails
         inbox.grid()
         Button(ff, text="Read Message",
-               command=readmessage).grid(row=2, column=0, pady=3)
+               command=readmessage).grid(pady=3)
         Button(ff, text="Purge Inbox",
-               command=purgeinbox).grid(row=3, column=0, pady=3)
+               command=purgeinbox).grid(pady=3)
 
-        msg = Label(ff, text="Username", font=("Calibri", 12))
-        msg.grid()
         ff.grid(padx=40)
 
 
