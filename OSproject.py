@@ -42,6 +42,7 @@ window.resizable(width=False, height=False)
 ff = Frame(window)
 semLogin = 0
 
+
 class mail:
     def __init__(self):
         global ff
@@ -58,14 +59,14 @@ class mail:
         self.backbutton.destroy()
         self.backbutton = ttk.Button(window, text="Back", command=cmd)
         self.backbutton.grid(sticky=W)
-        
+
     def logoutButton(self):
         global semLogin
         semLogin = 0
         self.backbutton.destroy()
         self.backbutton = ttk.Button(window, text="Logout", command=self.login)
         self.backbutton.grid(sticky=W)
-        
+
     def die(self):
         ff.destroy()
         self.backbutton.destroy()
@@ -92,7 +93,6 @@ class mail:
         self.emptysubject = Label(
             ff, text="Subject cannot be empty!", font=("Calibri", 10))
 
-
     def clear(self):
         self.prior.set("")
         self.toget.set("")
@@ -102,7 +102,7 @@ class mail:
 
     def forgeterrors(self):
         enames = ['incorrectemail', 'enteremail', 'emptybody']
-        
+
         self.incorrectemail.grid_forget()
         self.enteremail.grid_forget()
         self.emptybody.grid_forget()
@@ -273,7 +273,7 @@ class mail:
                             ctr = 1
                         if ctr == 1 and "<priority>" not in line:
                             s1 += line
-            
+
             self.editbody = s1
 
             cb.insert(END, self.editbody)
@@ -331,7 +331,7 @@ class mail:
         for r, d, f in os.walk(p1 + '\\sentbox'):
             for file in f:
                 if '.txt' in file:
-                    s1 = "--" + self.user.get() 
+                    s1 = "--" + self.user.get()
                     if s1 in file:
                         s2 = file.split("--")
                         s3 = s2[0]
@@ -388,7 +388,7 @@ class mail:
                             ctr = 1
                         if ctr == 1 and "<priority>" not in line:
                             s1 += line
-            
+
             self.readbody = s1
 
             cb.insert(END, self.readbody)
@@ -472,29 +472,29 @@ class mail:
 
     def login(self):
         global semLogin
-        
+
         self.die()
         self.create()
         self.clear()
 
-        l1=Label(ff, text="Email ID", font=("Calibri", 12))
+        l1 = Label(ff, text="Email ID", font=("Calibri", 12))
         l1.grid(pady=5)
-        
+
         e1 = ttk.Entry(ff, textvariable=self.user)
         e1.grid()
 
         l2 = Label(ff, text="Password", font=("Calibri", 12))
         l2.grid(pady=5)
-        
+
         e2 = ttk.Entry(ff, textvariable=self.pwd, show="*")
         e2.grid()
-        
+
         bframe = Frame(ff)
         b1 = Button(bframe, text="Login", command=self.validatelogin,
-               height=2, width=8)
+                    height=2, width=8)
         b1.grid()
         b2 = Button(bframe, text="Register", command=self.register,
-               height=2, width=8)
+                    height=2, width=8)
         b2.grid(pady=6)
         bframe.grid(pady=6)
 
@@ -506,7 +506,7 @@ class mail:
             e2.configure(state='disabled')
             b1.configure(state='disabled')
             b2.configure(state='disabled')
-        
+
         ff.grid(padx=52, pady=40)
 
     def read(self):
@@ -540,8 +540,9 @@ class mail:
             lines = []
             with open('sentbox\\' + file_to_display) as fc:
                 for line in fc.readlines():
-                    l = line.split("<priority>")[1].split("<body>")
-                    lines.append(l[1])
+                    print(line)
+                    l = line.split("<subject>")[0].split("<body>")
+                    lines.append(l[0])
 
             msg.config(text="".join(lines))
             if(file_count < 6):
