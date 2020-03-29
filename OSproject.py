@@ -356,7 +356,7 @@ class mail:
                 if self.click not in line:
                     l2.append(line)
                 else:
-                    l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.editbody +
+                    l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.readbody +
                               "<body>" + cb.get('1.0', 'end'))
         fc.close()
         fc = open(s3, "w")
