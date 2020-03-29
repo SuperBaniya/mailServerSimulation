@@ -37,6 +37,7 @@ spamwords = [re.sub('\n', '', word) for word in spamwords]
 
 window = Tk()
 window.geometry("250x400")
+window.title("Email Service")
 window.resizable(width=False, height=False)
 ff = Frame(window)
 semLogin = 0
@@ -356,7 +357,7 @@ class mail:
                 if self.click not in line:
                     l2.append(line)
                 else:
-                    l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.readbody +
+                    l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.editbody +
                               "<body>" + cb.get('1.0', 'end'))
         fc.close()
         fc = open(s3, "w")
