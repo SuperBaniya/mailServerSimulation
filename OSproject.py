@@ -39,7 +39,7 @@ window = Tk()
 window.geometry("250x400")
 window.resizable(width=False, height=False)
 ff = Frame(window)
-
+semLogin = 0
 
 class mail:
     def __init__(self):
@@ -93,8 +93,10 @@ class mail:
 
     def forgeterrors(self):
         enames = ['incorrectemail', 'enteremail', 'emptybody']
-        for i in enames:
-            exec("self.%s.grid_forget()" % i)
+        
+        self.incorrectemail.grid_forget()
+        self.enteremail.grid_forget()
+        self.emptybody.grid_forget()
 
     def sendfunc(self):
         self.forgeterrors()
@@ -286,6 +288,7 @@ class mail:
         ff.grid(padx=90, pady=75)
 
     def validatelogin(self):
+        global semLogin
         u1 = self.user.get()
         pwd = self.pwd.get()
         ctr = 0
@@ -298,6 +301,7 @@ class mail:
             if ctr == 0:
                 self.invalid.grid()
             else:
+                semLogin = 1
                 self.home()
         except:
             self.invalid.grid()
@@ -336,21 +340,42 @@ class mail:
         ff.grid(padx=50, pady=60)
 
     def login(self):
+        global semLogin
+        
         self.die()
         self.create()
         self.clear()
 
-        Label(ff, text="Email ID", font=("Calibri", 12)).grid(pady=5)
-        ttk.Entry(ff, textvariable=self.user).grid()
-        Label(ff, text="Password", font=("Calibri", 12)).grid(pady=5)
-        ttk.Entry(ff, textvariable=self.pwd, show="*").grid()
+        l1=Label(ff, text="Email ID", font=("Calibri", 12))
+        l1.grid(pady=5)
+        
+        e1 = ttk.Entry(ff, textvariable=self.user)
+        e1.grid()
 
+        l2 = Label(ff, text="Password", font=("Calibri", 12))
+        l2.grid(pady=5)
+        
+        e2 = ttk.Entry(ff, textvariable=self.pwd, show="*")
+        e2.grid()
+        
         bframe = Frame(ff)
-        Button(bframe, text="Login", command=self.validatelogin,
-               height=2, width=8).grid()
-        Button(bframe, text="Register", command=self.register,
-               height=2, width=8).grid(pady=6)
+        b1 = Button(bframe, text="Login", command=self.validatelogin,
+               height=2, width=8)
+        b1.grid()
+        b2 = Button(bframe, text="Register", command=self.register,
+               height=2, width=8)
+        b2.grid(pady=6)
         bframe.grid(pady=6)
+
+        if semLogin != 0:
+            Label(ff, text="System busy!", fg='red').grid()
+            l1.configure(state='disabled')
+            l2.configure(state='disabled')
+            e1.configure(state='disabled')
+            e2.configure(state='disabled')
+            b1.configure(state='disabled')
+            b2.configure(state='disabled')
+        
         ff.grid(padx=52, pady=40)
 
     def read(self):
