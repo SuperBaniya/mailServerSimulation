@@ -331,7 +331,7 @@ class mail:
         for r, d, f in os.walk(p1 + '\\sentbox'):
             for file in f:
                 if '.txt' in file:
-                    s1 = "--" + self.user.get()
+                    s1 = "--" + self.user.get() 
                     if s1 in file:
                         s2 = file.split("--")
                         s3 = s2[0]
@@ -356,9 +356,6 @@ class mail:
             for line in fc.readlines():
                 if self.click not in line:
                     l2.append(line)
-                else:
-                    l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.editbody +
-                              "<body>" + cb.get('1.0', 'end'))
         fc.close()
         fc = open(s3, "w")
         for i in l2:
@@ -369,7 +366,7 @@ class mail:
         try:
             self.die()
             self.create()
-            self.backButton(self.edit1)
+            self.backButton(self.read1)
             ttk.Label(ff, text="Edit Message", font=(
                 "Calibri", 12)).grid(row=0, column=0)
             ttk.Label(ff, text=f"To:  {self.choose.get()}", font=(
@@ -377,23 +374,23 @@ class mail:
             self.selectsomething = Label(ff, text="Please ensure selection!")
             self.selectsomething.grid_forget()
             global cb
-            cb = Text(ff, height=10, width=29, state='disabled')
+            cb = Text(ff, height=10, width=29)
             ctr = 0
             with open(s3) as fc:
-                with open(s3) as fc:
-                    for line in fc.readlines():
-                        if self.click in line:
-                            l2 = line.split("<body>")
-                            s1 = l2[1]
-                            ctr = 1
-                        if ctr == 1 and "<priority>" not in line:
-                            s1 += line
-
+                for line in fc.readlines():
+                    if self.click in line:
+                        l2 = line.split("<body>")
+                        s1 = l2[1]
+                        ctr += 1
+                    elif ctr > 0 and "<priority>" not in line:
+                        s1 += line
+                    elif ctr > 0 and "<priority>" in line:
+                        break
             self.readbody = s1
-
+            
             cb.insert(END, self.readbody)
             cb.grid(padx=6)
-
+            cb.configure(state="disabled")
             self.prior.set(1)
             ttk.Label(ff, text="Priority", font=("Calibri", 12)).grid()
             priorbox = ttk.Spinbox(
