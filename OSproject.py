@@ -293,9 +293,9 @@ class mail:
     def read1func(self):
         self.selectsomething = Label(ff, text="Please ensure selection!")
         self.selectsomething.grid_forget()
-        global s3
+        global s3, s4
         s3 = p1 + "\\sentbox\\" + self.choose.get() + "--" + self.user.get() + ".txt"
-
+        s4 = p1 + "\\receivedbox\\" + self.user.get() + "--" + self.choose.get() + ".txt"
         self.lb1.delete(0, END)
         l1.clear()
         try:
@@ -336,7 +336,7 @@ class mail:
                         s2 = file.split("--")
                         s3 = s2[0]
                         files.append(s3)
-
+    
         ttk.Label(ff, text="Select Email ID", font=(
             "Calibri", 12)).grid(row=0, column=0)
         self.lb1.grid(row=3, column=0)
@@ -356,6 +356,11 @@ class mail:
             for line in fc.readlines():
                 if self.click not in line:
                     l2.append(line)
+        
+        with open(s4) as fc:
+            for line in fc.readlines():
+                l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.editbody +
+                            "<body>" + cb.get('1.0', 'end'))
         fc.close()
         fc = open(s3, "w")
         for i in l2:
