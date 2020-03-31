@@ -181,16 +181,15 @@ class mail:
         self.editbutton.configure(state = "normal")
 
     def edit1func(self):
-        # self.selectsomething = Label(ff, text="Please ensure selection!")
-        # self.selectsomething.grid_forget()
         global s3, fp
         fp = self.user.get() + "--" + self.choose.get() + ".txt"
         s3 = p1 + "\\sentbox\\"
 
         self.lb1.delete(0, END)
+        self.editbutton.configure(state = "disabled")
         l1.clear()
 
-        # try:
+
         for r, d, f in os.walk(p1 + '\\sentbox'):
             for file in f:
                 if fp == file:
@@ -205,9 +204,6 @@ class mail:
                                 l1.append(s2[1])
         for f in l1:
             self.lb1.insert(END, f)
-
-        # except:
-        #     self.selectsomething.grid()
 
         self.lb1.bind('<<ListboxSelect>>', self.onselect)
 
