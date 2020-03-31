@@ -718,19 +718,33 @@ class mail:
                             file_names.append(file)
 
         def readmessage():
+            def revSort(tup):   
+                lst = len(tup)  
+                for i in range(0, lst):  
+                    for j in range(0, lst-i-1):  
+                        if (tup[j][1] > tup[j + 1][1]):  
+                            temp = tup[j]  
+                            tup[j]= tup[j + 1]  
+                            tup[j + 1]= temp
+                return tup[::-1]
             msg.config(text="")
             sender = inbox.get()
             file_to_display = file_names[senders_emails.index(sender)]
             lines = []
             try:
+                priorlist=[]
                 with open('sentbox\\' + file_to_display) as fc:
                     reads = fc.read()
                     x = reads.split("<priority>")
                     del x[0]
                     for mail in x:
                         y = mail.split("<body>")
-                        lines.append(y[1])
-                        lines.append("\n------\n")
+                        forprior = (y[1], int(y[0][0]))
+                        priorlist.append(forprior)
+                
+                for vals in revSort(priorlist):
+                    lines.append(vals[0])
+                    lines.append("\n------\n")
                 msg.config(text="".join(lines))
                 if(file_count < 6):
                     os.replace(os.getcwd() + "\\sentbox\\" + file_to_display,
