@@ -590,7 +590,7 @@ class mail:
                height=2, width=8).grid(pady=5)
         Button(ff, text="Edit", command=self.edit1,
                height=2, width=8).grid(pady=5)
-        Button(ff, text="Read", command=self.read1,
+        Button(ff, text="Read", command=self.read,
                height=2, width=8).grid(pady=5)
         ff.grid(padx=90, pady=75)
 
@@ -700,31 +700,41 @@ class mail:
         path, dirs, files = next(os.walk("receivedbox"))
         file_count = len(files)
 
+        exclude=set("spam")
+        
         for r, d, f in os.walk(p1 + '\\sentbox'):
             for file in f:
                 if '.txt' in file:
                     s1 = "--" + self.user.get()
-                    if s1 in file:
-                        s2 = file.split("--")
-                        senders_emails.append(s2[0])
-                        file_names.append(file)
+                    if 'spam' not in r:
+                        if s1 in file:
+                            s2 = file.split("--")
+                            senders_emails.append(s2[0])
+                            file_names.append(file)
 
         def readmessage():
+            msg.config(text="")
             sender = inbox.get()
             file_to_display = file_names[senders_emails.index(sender)]
             lines = []
-            with open('sentbox\\' + file_to_display) as fc:
-                for line in fc.readlines():
-                    l = line.split("<subject>")[0].split("<body>")
-                    lines.append(l[0])
-
-            msg.config(text="".join(lines))
-            if(file_count < 6):
-                os.replace(os.getcwd() + "\\sentbox\\" + file_to_display,
-                           os.getcwd() + "\\receivedbox\\" + file_to_display)
-            else:
-                os.replace(os.getcwd() + "\\sentbox\\" + file_to_display,
-                           os.getcwd() + "\\receivedbox\\queue\\" + file_to_display)
+            try:
+                with open('sentbox\\' + file_to_display) as fc:
+                    reads = fc.read()
+                    x = reads.split("<priority>")
+                    del x[0]
+                    for mail in x:
+                        y = mail.split("<body>")
+                        lines.append(y[1])
+                        lines.append("\n------\n")
+                msg.config(text="".join(lines))
+                if(file_count < 6):
+                    os.replace(os.getcwd() + "\\sentbox\\" + file_to_display,
+                               os.getcwd() + "\\receivedbox\\" + file_to_display)
+                else:
+                    os.replace(os.getcwd() + "\\sentbox\\" + file_to_display,
+                               os.getcwd() + "\\receivedbox\\queue\\" + file_to_display)
+            except FileNotFoundError:
+                pass
 
         def purgeinbox():
             dir_name = os.getcwd() + "\\receivedbox"
