@@ -459,7 +459,7 @@ class mail:
         p1 = os.getcwd()
 
         global l1
-        files, l1 = [], []
+        files, l1 = set(), []
 
         for r, d, f in os.walk(p1 + '\\sentbox'):
             for file in f:
@@ -468,7 +468,7 @@ class mail:
                     if s1 in file:
                         s2 = file.split("--")
                         s3 = s2[0]
-                        files.append(s3)
+                        files.add(s3)
 
         ttk.Label(ff, text="Select Email ID", font=(
             "Calibri", 12)).grid(row=0, column=0)
@@ -532,6 +532,7 @@ class mail:
             fc.write(i)
         fc.close()
         self.read1()
+
     def read2(self):
         try:
             self.die()
