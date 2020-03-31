@@ -108,6 +108,7 @@ class mail:
         self.emptybody.grid_forget()
 
     def sendfunc(self):
+        self.clear()
         self.forgeterrors()
         dir = path.dirname(__file__)
         to = self.toget.get()
@@ -174,13 +175,10 @@ class mail:
         ff.grid()
 
     def onselect(self, evt):
-        try:
-            self.selectsomething.grid_forget()
-            w = evt.widget
-            index = int(w.curselection()[0])
-            self.click = w.get(index)
-        except:
-            pass
+        w = evt.widget
+        index = int(w.curselection()[0])
+        self.click = w.get(index)
+        self.editbutton.configure(state = "normal")
 
     def edit1func(self):
         # self.selectsomething = Label(ff, text="Please ensure selection!")
@@ -243,7 +241,9 @@ class mail:
         ttk.OptionMenu(ff, self.choose, "Select one", *files,
                        command=lambda _: self.edit1func()).grid(row=1, column=0)
 
-        ttk.Button(ff, text="Edit", command=self.edit2).grid(pady=5)
+        self.editbutton = ttk.Button(ff, text="Edit", command=self.edit2)
+        self.editbutton.configure(state="disabled")
+        self.editbutton.grid(pady=5)
 
         ff.grid(padx=36, pady=30)
 
@@ -252,6 +252,7 @@ class mail:
         l2, ctr1, ctr2 = [], 0, 0
         # ctr1 indicates if its still spam or not
         # ctr2 indicates if its in spam folder or not
+
         sub = ">" + self.click + "<"
         content = cb.get('1.0', 'end')
 
@@ -371,22 +372,25 @@ class mail:
             for i in l2:
                 fc.write(i)
             fc.close()
+            del self.click
             self.edit1()
     def edit2(self):
-        try:
-            self.die()
-            self.create()
-            self.backButton(self.edit1)
-            ttk.Label(ff, text="Edit Message", font=(
-                "Calibri", 12)).grid(row=0, column=0)
-            ttk.Label(ff, text=f"To:  {self.choose.get()}", font=(
-                "Calibri", 12)).grid(row=1, column=0)
-            self.selectsomething = Label(ff, text="Please ensure selection!")
-            self.selectsomething.grid_forget()
-            global cb
-            cb = Text(ff, height=10, width=29)
-            ctr = 0
 
+        self.die()
+        self.create()
+        self.backButton(self.edit1)
+        ttk.Label(ff, text="Edit Message", font=(
+            "Calibri", 12)).grid(row=0, column=0)
+        ttk.Label(ff, text=f"To:  {self.choose.get()}", font=(
+            "Calibri", 12)).grid(row=1, column=0)
+        global cb
+        cb = Text(ff, height=10, width=29)
+        ctr = 0
+        self.selectsomething = Label(ff, text="Please ensure selection!")
+        self.editsavebutton = ttk.Button(ff, text="Save", command=self.edit2func)
+        try:
+            self.selectsomething.grid_forget()
+            self.editsavebutton.configure(state="normal")
             sub = ">" + self.click + "<"
             s3 = p1 +"\\sentbox\\" + fp
 
@@ -399,32 +403,37 @@ class mail:
                                     if "spam" in r:
                                         s3 = p1 + "\\sentbox\\spam\\"+fp
                                         break
+            try:
+                with open(s3) as fc:
+                    for line in fc.readlines():
+                        if sub in line:
+                            l2 = line.split("<body>")
+                            s1 = l2[1]
+                            ctr += 1
+                        elif ctr > 0 and "<priority>" not in line:
+                            s1 += line
+                        elif ctr > 0 and "<priority>" in line:
+                            break
+                self.editbody = s1
 
-            with open(s3) as fc:
-                for line in fc.readlines():
-                    if sub in line:
-                        l2 = line.split("<body>")
-                        s1 = l2[1]
-                        ctr += 1
-                    elif ctr > 0 and "<priority>" not in line:
-                        s1 += line
-                    elif ctr > 0 and "<priority>" in line:
-                        break
-
-            self.editbody = s1
-
-            cb.insert(END, self.editbody)
-            cb.grid(padx=6)
-
-            self.prior.set(1)
-            ttk.Label(ff, text="Priority", font=("Calibri", 12)).grid()
-            priorbox = ttk.Spinbox(
-                ff, from_=0.0, to=4.0, textvariable=self.prior, wrap=True, width=5, state='readonly')
-            priorbox.grid()
-
-            ttk.Button(ff, text="Save", command=self.edit2func).grid(pady=5)
-        except:
+                cb.insert(END, self.editbody)
+                cb.grid(padx=6)
+            except FileNotFoundError:
+                self.selectsomething.grid()
+                self.editsavebutton.configure(state="disabled")
+        except AttributeError:
             self.selectsomething.grid()
+            self.editsavebutton.configure(state="disabled")
+
+        self.prior.set(1)
+        ttk.Label(ff, text="Priority", font=("Calibri", 12)).grid()
+        priorbox = ttk.Spinbox(
+            ff, from_=0.0, to=4.0, textvariable=self.prior, wrap=True, width=5, state='readonly')
+        priorbox.grid()
+
+        self.editsavebutton.grid(pady=5)
+##        except:
+##            self.selectsomething.grid()
         ff.grid(pady=2)
 
     def read1func(self):
