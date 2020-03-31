@@ -171,33 +171,42 @@ class mail:
         ff.grid()
 
     def onselect(self, evt):
-        w = evt.widget
-        index = int(w.curselection()[0])
-        self.click = w.get(index)
+        try:
+            self.selectsomething.grid_forget()
+            w = evt.widget
+            index = int(w.curselection()[0])
+            self.click = w.get(index)
+        except:
+            pass
 
     def edit1func(self):
-        self.selectsomething = Label(ff, text="Please ensure selection!")
-        self.selectsomething.grid_forget()
-        global s3
-        s3 = p1 + "\\sentbox\\" + self.user.get() + "--" + self.choose.get() + ".txt"
+        # self.selectsomething = Label(ff, text="Please ensure selection!")
+        # self.selectsomething.grid_forget()
+        global s3, fp
+        fp = self.user.get() + "--" + self.choose.get() + ".txt"
+        s3 = p1 + "\\sentbox\\"
 
         self.lb1.delete(0, END)
         l1.clear()
-        try:
-            with open(s3) as fc:
-                for line in fc.readlines():
-                    if "<priority>" in line:
-                        s1 = line.split("\n")
-                        s2 = "".join(s1[0])
-                        s2 = s2.split("<body>")
-                        s2 = "".join(s2[0])
-                        s2 = s2.split("<subject>")
-                        l1.append(s2[1])
 
-            for f in l1:
-                self.lb1.insert(END, f)
-        except:
-            self.selectsomething.grid()
+        # try:
+        for r, d, f in os.walk(p1 + '\\sentbox'):
+            for file in f:
+                if fp == file:
+                    with open(r+"\\"+fp) as fc:
+                        for line in fc.readlines():
+                            if "<priority>" in line:
+                                s1 = line.split("\n")
+                                s2 = "".join(s1[0])
+                                s2 = s2.split("<body>")
+                                s2 = "".join(s2[0])
+                                s2 = s2.split("<subject>")
+                                l1.append(s2[1])
+        for f in l1:
+            self.lb1.insert(END, f)
+
+        # except:
+        #     self.selectsomething.grid()
 
         self.lb1.bind('<<ListboxSelect>>', self.onselect)
 
@@ -206,11 +215,11 @@ class mail:
         self.create()
         self.backButton(self.home)
 
-        global p1
+        global p1, ctr
         p1 = os.getcwd()
 
         global l1
-        files, l1 = [], []
+        files, l1 = set(), []
 
         for r, d, f in os.walk(p1 + '\\sentbox'):
             for file in f:
@@ -219,7 +228,7 @@ class mail:
                     if s1 in file:
                         s2 = file.split("--")
                         s3 = s2[1].split(".txt")
-                        files.append(s3[0])
+                        files.add(s3[0])
 
         ttk.Label(ff, text="Select Email ID", font=(
             "Calibri", 12)).grid(row=0, column=0)
@@ -227,6 +236,7 @@ class mail:
 
         ttk.Label(ff, text="Select Mail", font=(
             "Calibri", 12)).grid(row=2, column=0)
+
         ttk.OptionMenu(ff, self.choose, "Select one", *files,
                        command=lambda _: self.edit1func()).grid(row=1, column=0)
 
@@ -235,20 +245,130 @@ class mail:
         ff.grid(padx=36, pady=30)
 
     def edit2func(self):
-        l2 = []
-        with open(s3) as fc:
-            for line in fc.readlines():
-                if self.click not in line:
-                    l2.append(line)
-                else:
-                    l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.editbody +
-                              "<body>" + cb.get('1.0', 'end'))
-        fc.close()
-        fc = open(s3, "w")
-        for i in l2:
-            fc.write(i)
-        fc.close()
+        global sp
+        l2, ctr1, ctr2 = [], 0, 0
+        # ctr1 indicates if its still spam or not
+        # ctr2 indicates if its in spam folder or not
+        sub = ">" + self.click + "<"
+        content = cb.get('1.0', 'end')
 
+        for word in spamwords:
+            if word in content:
+                ctr1 = 1
+                break
+
+        for r, d, f in os.walk(p1 + '\\sentbox'):
+            for file in f:
+                if fp == file:
+                    with open(r + "\\" + fp) as fc:
+                        for line in fc.readlines():
+                            if sub in line:
+                                if "spam" in r:
+                                    ctr2 = 1
+
+        if ctr1 == 1 and ctr2 == 1:
+            with open(s3+fp) as fc:
+                for line in fc.readlines():
+                    if sub not in line:
+                        l2.append(line)
+                    else:
+                        l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.click +
+                                  "<body>" + content)
+            fc.close()
+            fc = open(s3+fp, "w")
+            for i in l2:
+                fc.write(i)
+            fc.close()
+
+        if ctr1 == 1 and ctr2 == 1:
+            with open(s3+"spam\\"+fp) as fc:
+                for line in fc.readlines():
+                    if sub not in line:
+                        l2.append(line)
+                    else:
+                        l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.click +
+                                  "<body>" + content)
+            fc.close()
+            fc = open(s3+"spam\\"+fp, "w")
+            for i in l2:
+                fc.write(i)
+            fc.close()
+
+        if ctr1 == 1 and ctr2 == 0:
+            l2, ctr, l3 = [], 0, []
+            with open(s3+fp) as fc:
+                for line in fc.readlines():
+                    if sub in line:
+                        l2.append(line)
+                        ctr += 1
+                    elif ctr > 0 and "<priority>" not in line:
+                        l2.append(line)
+                    elif ctr > 0 and "<priority>" in line:
+                        break
+
+            with open(s3+fp) as fc:
+                for line in fc.readlines():
+                    if line not in l2:
+                        l3.append(line)
+
+            l2 = ["<priority>" + str(self.prior.get()) + "<subject>" + self.click + "<body>" + content]
+
+            if not l3:
+                os.remove(s3+fp)
+            else:
+                fc = open(s3+fp, "w")
+                for i in l3:
+                    fc.write(i)
+                fc.close()
+
+            s4 = s3 + "spam\\" + fp
+            if path.isfile(s4):
+                with open(s4) as fc:
+                    for line in fc.readlines():
+                        l2.append(line)
+
+            fc = open(s4, "w")
+            for i in l2:
+                fc.write(i)
+            fc.close()
+
+        if ctr1 == 0 and ctr2 == 1:
+            l2, ctr, l3 = [], 0, []
+            with open(s3+"spam\\"+fp) as fc:
+                for line in fc.readlines():
+                    if sub in line:
+                        l2.append(line)
+                        ctr += 1
+                    elif ctr > 0 and "<priority>" not in line:
+                        l2.append(line)
+                    elif ctr > 0 and "<priority>" in line:
+                        break
+
+            with open(s3+"spam\\"+fp) as fc:
+                for line in fc.readlines():
+                    if line not in l2:
+                        l3.append(line)
+
+            if not l3:
+                os.remove(s3+"spam\\"+fp)
+            else:
+                fc = open(s3+"spam\\"+fp, "w")
+                for i in l3:
+                    fc.write(i)
+                fc.close()
+
+            l2 = ["<priority>" + str(self.prior.get()) + "<subject>" + self.click + "<body>" + content]
+            s4 = s3 + fp
+            if path.isfile(s4):
+                with open(s4) as fc:
+                    for line in fc.readlines():
+                        l2.append(line)
+
+            fc = open(s4, "w")
+            for i in l2:
+                fc.write(i)
+            fc.close()
+            self.edit1()
     def edit2(self):
         try:
             self.die()
@@ -263,9 +383,23 @@ class mail:
             global cb
             cb = Text(ff, height=10, width=29)
             ctr = 0
+
+            sub = ">" + self.click + "<"
+            s3 = p1 +"\\sentbox\\" + fp
+
+            for r, d, f in os.walk(p1 + '\\sentbox'):
+                for file in f:
+                    if fp == file:
+                        with open(r + "\\" + fp) as fc:
+                            for line in fc.readlines():
+                                if sub in line:
+                                    if "spam" in r:
+                                        s3 = p1 + "\\sentbox\\spam\\"+fp
+                                        break
+
             with open(s3) as fc:
                 for line in fc.readlines():
-                    if self.click in line:
+                    if sub in line:
                         l2 = line.split("<body>")
                         s1 = l2[1]
                         ctr += 1
@@ -307,7 +441,6 @@ class mail:
                         s2 = s2.split("<body>")
                         s2 = "".join(s2[0])
                         s2 = s2.split("<subject>")
-                        print(s2)
                         l1.append(s2[1])
 
             for f in l1:
@@ -331,12 +464,12 @@ class mail:
         for r, d, f in os.walk(p1 + '\\sentbox'):
             for file in f:
                 if '.txt' in file:
-                    s1 = "--" + self.user.get() 
+                    s1 = "--" + self.user.get()
                     if s1 in file:
                         s2 = file.split("--")
                         s3 = s2[0]
                         files.append(s3)
-    
+
         ttk.Label(ff, text="Select Email ID", font=(
             "Calibri", 12)).grid(row=0, column=0)
         self.lb1.grid(row=3, column=0)
@@ -348,42 +481,76 @@ class mail:
 
         ttk.Button(ff, text="Read", command=self.read2).grid(pady=5)
 
+        def purgeinbox():
+            dir_name = os.getcwd() + "\\receivedbox"
+            test = os.listdir(dir_name)
+
+            for item in test:
+                if item.endswith(".txt"):
+                    os.remove(os.path.join(dir_name, item))
+            dir_name = os.getcwd() + "\\receivedbox\\queue"
+            test = os.listdir(dir_name)
+
+            for item in test:
+                os.replace(os.getcwd() + "\\receivedbox\\queue" + item,
+                           os.getcwd() + "\\receivedbox\\" + item)
+        Button(ff, text="Purge Inbox",
+               command=purgeinbox).grid(pady=3)
+        
         ff.grid(padx=36, pady=30)
 
     def read2func(self):
-        l2 = []
+
+        sub = ">" + self.click + "<"
+        l2, ctr, l3 = [], 0, []
         with open(s3) as fc:
             for line in fc.readlines():
-                if self.click not in line:
+                if sub in line:
                     l2.append(line)
-        
-        with open(s4) as fc:
+                    ctr += 1
+                elif ctr > 0 and "<priority>" not in line:
+                        l2.append(line)
+                elif ctr > 0 and "<priority>" in line:
+                    break
+
+        with open(s3) as fc:
             for line in fc.readlines():
-                l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.editbody +
-                            "<body>" + cb.get('1.0', 'end'))
-        fc.close()
-        fc = open(s3, "w")
+                if line not in l2:
+                    l3.append(line)
+
+        if not l3:
+            os.remove(s3)
+        else:
+            fc = open(s3, "w")
+            for i in l3:
+                fc.write(i)
+            fc.close()
+
+        s4 = p1 + "\\receivedbox\\" + self.choose.get() + "--" + self.user.get() + ".txt"
+        fc = open(s4, "w")
         for i in l2:
             fc.write(i)
         fc.close()
-
+        self.read1()
     def read2(self):
         try:
             self.die()
             self.create()
             self.backButton(self.read1)
-            ttk.Label(ff, text="Edit Message", font=(
+            ttk.Label(ff, text="Read Message", font=(
                 "Calibri", 12)).grid(row=0, column=0)
-            ttk.Label(ff, text=f"To:  {self.choose.get()}", font=(
+            ttk.Label(ff, text=f"From:  {self.choose.get()}", font=(
                 "Calibri", 12)).grid(row=1, column=0)
             self.selectsomething = Label(ff, text="Please ensure selection!")
             self.selectsomething.grid_forget()
             global cb
             cb = Text(ff, height=10, width=29)
             ctr = 0
+            sub = ">" + self.click + "<"
+
             with open(s3) as fc:
                 for line in fc.readlines():
-                    if self.click in line:
+                    if sub in line:
                         l2 = line.split("<body>")
                         s1 = l2[1]
                         ctr += 1
@@ -391,8 +558,9 @@ class mail:
                         s1 += line
                     elif ctr > 0 and "<priority>" in line:
                         break
+
             self.readbody = s1
-            
+
             cb.insert(END, self.readbody)
             cb.grid(padx=6)
             cb.configure(state="disabled")
@@ -403,7 +571,9 @@ class mail:
             priorbox.grid()
 
             ttk.Button(ff, text="Close", command=self.read2func).grid(pady=5)
+
         except:
+            self.backButton(self.read1)
             self.selectsomething.grid()
         ff.grid(pady=2)
 
@@ -416,7 +586,7 @@ class mail:
                height=2, width=8).grid(pady=5)
         Button(ff, text="Edit", command=self.edit1,
                height=2, width=8).grid(pady=5)
-        Button(ff, text="Read", command=self.read,
+        Button(ff, text="Read", command=self.read1,
                height=2, width=8).grid(pady=5)
         ff.grid(padx=90, pady=75)
 
@@ -533,7 +703,6 @@ class mail:
                     if s1 in file:
                         s2 = file.split("--")
                         senders_emails.append(s2[0])
-                        # print(s1)
                         file_names.append(file)
 
         def readmessage():
@@ -542,7 +711,6 @@ class mail:
             lines = []
             with open('sentbox\\' + file_to_display) as fc:
                 for line in fc.readlines():
-                    print(line)
                     l = line.split("<subject>")[0].split("<body>")
                     lines.append(l[0])
 
