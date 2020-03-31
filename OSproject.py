@@ -136,6 +136,9 @@ class mail:
                         f.write(msg)
                         f.close()
                         contentbody.delete('1.0', 'end')
+                        self.sub.set("")
+                        self.prior.set(1)
+                        self.toget.set("")
                     else:
                         self.emptysubject.grid()
                 else:
