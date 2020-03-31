@@ -92,6 +92,8 @@ class mail:
         self.lb1 = Listbox(ff, width=25)
         self.emptysubject = Label(
             ff, text="Subject cannot be empty!", font=("Calibri", 10))
+        self.illegalseq = Label(
+            ff, text="Illegal sequence entered!", font=("Calibri", 10))
 
     def clear(self):
         self.prior.set("")
@@ -102,17 +104,17 @@ class mail:
 
     def forgeterrors(self):
         enames = ['incorrectemail', 'enteremail', 'emptybody']
-
         self.incorrectemail.grid_forget()
         self.enteremail.grid_forget()
         self.emptybody.grid_forget()
-
+        self.illegalseq.grid_forget()
+        
     def sendfunc(self):
-        self.clear()
         self.forgeterrors()
         dir = path.dirname(__file__)
         to = self.toget.get()
         x = self.user.get()
+        illegals = ["<priority>", "<subject>", "<body>"]
         if to:
             tmp = re.search("(\w+\.?)+@\w+.\w+", to)
             if tmp:
@@ -121,25 +123,33 @@ class mail:
                 priority = self.prior.get()
                 if content != "\n":
                     if self.sub.get() != "":
-                        for word in spamwords:
-                            if word in content:
-                                ndir = path.join(
-                                    dir, f"sentbox\\spam\\{x}--{to}.txt")
+                        isIllegal = False
+                        for il in illegals:
+                            if il in content:
+                                isIllegal = True
                                 break
-                        try:
-                            f = open(ndir, 'r+')
-                        except:
-                            f = open(ndir, 'w+')
-                        msg = ""
-                        msg += "<priority>" + \
-                               str(priority) + "<subject>" + \
-                            self.sub.get() + "<body>" + content
-                        f.write(msg)
-                        f.close()
-                        contentbody.delete('1.0', 'end')
-                        self.sub.set("")
-                        self.prior.set(1)
-                        self.toget.set("")
+                        if not isIllegal:
+                            for word in spamwords:
+                                if word in content:
+                                    ndir = path.join(
+                                        dir, f"sentbox\\spam\\{x}--{to}.txt")
+                                    break
+                            try:
+                                f = open(ndir, 'r+')
+                            except:
+                                f = open(ndir, 'w+')
+                            msg = ""
+                            msg += "<priority>" + \
+                                   str(priority) + "<subject>" + \
+                                self.sub.get() + "<body>" + content
+                            f.write(msg)
+                            f.close()
+                            contentbody.delete('1.0', 'end')
+                            self.sub.set("")
+                            self.prior.set(1)
+                            self.toget.set("")
+                        else:
+                            self.illegalseq.grid()
                     else:
                         self.emptysubject.grid()
                 else:
