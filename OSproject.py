@@ -276,7 +276,7 @@ class mail:
                                 if "spam" in r:
                                     ctr2 = 1
 
-        if ctr1 == 1 and ctr2 == 1:
+        if ctr1 == 0 and ctr2 == 0:
             with open(s3+fp) as fc:
                 for line in fc.readlines():
                     if sub not in line:
