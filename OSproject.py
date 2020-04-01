@@ -258,9 +258,11 @@ class mail:
         l2, ctr1, ctr2 = [], 0, 0
         # ctr1 indicates if its still spam or not
         # ctr2 indicates if its in spam folder or not
-
+        s3 = p1 + "\\sentbox\\"
+        fp = self.user.get() + "--" + self.choose.get() + ".txt"
         sub = ">" + self.click + "<"
         content = cb.get('1.0', 'end')
+        ctr = 0
 
         for word in spamwords:
             if word in content:
@@ -277,43 +279,49 @@ class mail:
                                     ctr2 = 1
 
         if ctr1 == 0 and ctr2 == 0:
-            with open(s3+fp) as fc:
+            with open(s3 + fp) as fc:
                 for line in fc.readlines():
-                    if sub not in line:
-                        l2.append(line)
+                    if sub in line:
+                        l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.click + "<body>" + content)
+                        ctr += 1
+                    elif ctr == 1 and "<priority>" not in line:
+                        continue
                     else:
-                        l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.click +
-                                  "<body>" + content)
-            fc.close()
+                        ctr = 0
+                        l2.append(line)
+
             fc = open(s3+fp, "w")
             for i in l2:
                 fc.write(i)
             fc.close()
 
         if ctr1 == 1 and ctr2 == 1:
-            with open(s3+"spam\\"+fp) as fc:
+            with open(s3 + "spam\\" + fp) as fc:
                 for line in fc.readlines():
-                    if sub not in line:
-                        l2.append(line)
+                    if sub in line:
+                        l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.click + "<body>" + content)
+                        ctr = 1
+                    elif ctr == 1 and "<priority>" not in line:
+                        continue
                     else:
-                        l2.append("<priority>" + str(self.prior.get()) + "<subject>" + self.click +
-                                  "<body>" + content)
-            fc.close()
+                        ctr = 0
+                        l2.append(line)
+
             fc = open(s3+"spam\\"+fp, "w")
             for i in l2:
                 fc.write(i)
             fc.close()
 
         if ctr1 == 1 and ctr2 == 0:
-            l2, ctr, l3 = [], 0, []
+            l2, l3 = [], []
             with open(s3+fp) as fc:
                 for line in fc.readlines():
                     if sub in line:
                         l2.append(line)
-                        ctr += 1
-                    elif ctr > 0 and "<priority>" not in line:
+                        ctr = 1
+                    elif ctr == 1 and "<priority>" not in line:
                         l2.append(line)
-                    elif ctr > 0 and "<priority>" in line:
+                    elif ctr == 1 and "<priority>" in line:
                         break
 
             with open(s3+fp) as fc:
@@ -343,15 +351,15 @@ class mail:
             fc.close()
 
         if ctr1 == 0 and ctr2 == 1:
-            l2, ctr, l3 = [], 0, []
+            l2, l3 = [], []
             with open(s3+"spam\\"+fp) as fc:
                 for line in fc.readlines():
                     if sub in line:
                         l2.append(line)
-                        ctr += 1
-                    elif ctr > 0 and "<priority>" not in line:
+                        ctr = 1
+                    elif ctr == 1 and "<priority>" not in line:
                         l2.append(line)
-                    elif ctr > 0 and "<priority>" in line:
+                    elif ctr == 1 and "<priority>" in line:
                         break
 
             with open(s3+"spam\\"+fp) as fc:
@@ -378,10 +386,9 @@ class mail:
             for i in l2:
                 fc.write(i)
             fc.close()
-            del self.click
             self.edit1()
+            
     def edit2(self):
-
         self.die()
         self.create()
         self.backButton(self.edit1)
